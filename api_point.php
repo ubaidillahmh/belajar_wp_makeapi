@@ -104,7 +104,7 @@
                 'posts_per_page' => $isi['per_page'] != null ? $isi['per_page'] : '1',
                 'paged'     => $isi['page'] != null ? $isi['page'] : '1'
             );
-            $data[0]['test'] = $isi['page'];
+            // $data[0]['test'] = $isi['page'];
         }else{
             $arg    = array('post_type' => 'wt9-testimonial');
         }
