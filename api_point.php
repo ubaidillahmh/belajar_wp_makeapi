@@ -38,17 +38,17 @@
                     'date'      => array(
                         'required'  => true,
                         'validate_callback' => function($param, $request, $key) {
-                            $cekdate = checkdate(date('m', strtotime($param)), date('d', strtotime($param)), date('Y', strtotime($param)));
-                            return $cekdate;
+                            $checkdate = checkdate(date('m', strtotime($param)), date('d', strtotime($param)), date('Y', strtotime($param)));
+                            return $checkdate;
                         }
                     ),
                     'rate'      => array(
                         'required'  => true,
                         'validate_callback' => function ($param, $request, $key){
-                            $cekdata = [1, 2, 3, 4, 5];
-                            $cekavai = in_array($param, $cekdata);
+                            $checkdata = [1, 2, 3, 4, 5];
+                            $checkavailability = in_array($param, $checkdata);
 
-                            return $cekavai;
+                            return $checkavailability;
                         }
                     )
                 ),
@@ -95,24 +95,25 @@
         ));
     }
 
-    function api_getdata($isi)
+    function api_getdata($request)
     {
-        if($isi['page'] != null || $isi['per_page'] != null)
+        if($request['page'] != null || $request['per_page'] != null)
         {
             $arg = array(
                 'post_type' => 'wt9-testimonial',
-                'posts_per_page' => $isi['per_page'] != null ? $isi['per_page'] : '1',
-                'paged'     => $isi['page'] != null ? $isi['page'] : '1'
+                'posts_per_page' => $request['per_page'] != null ? $request['per_page'] : '1',
+                'paged'     => $request['page'] != null ? $request['page'] : '1'
             );
-            // $data[0]['test'] = $isi['page'];
+            // $data[0]['test'] = $request['page'];
         }else{
             $arg    = array('post_type' => 'wt9-testimonial');
         }
 
-        $inis   = new WP_Query($arg);
+        $init   = new WP_Query($arg);
 
         $i = 0;
-        while($inis->have_posts()):$inis->the_post();
+        $data = array();
+        while($init->have_posts()):$init->the_post();
             $data[$i]['id']    = get_the_ID() ;
             $data[$i]['title']    = get_the_title() ;
             $data[$i]['content']  = get_the_content(); 
@@ -124,7 +125,7 @@
 
         $return = array(
             'status'    => 'success',
-            'message'   => 'Berhasil',
+            'message'   => 'Get data Successful',
             'data'      => $data
         );
 
@@ -132,21 +133,22 @@
         if ( $data ) {
             return new WP_REST_Response( $return, 200 );
         } else {
-            return new WP_Error( 'code', __( 'message', 'text-domain' ) );
+            return new WP_Error( 400, 'Something Error' );
         }
     }
 
-    function api_getone($isi)
+    function api_getone($request)
     {
         $arg    = array(
             'post_type' => 'wt9-testimonial',
-            'p'         => $isi['id']
+            'p'         => $request['id']
         );
 
-        $inis   = new WP_Query($arg);
+        $init   = new WP_Query($arg);
 
         $i = 0;
-        while($inis->have_posts()):$inis->the_post();
+        $data = array();
+        while($init->have_posts()):$init->the_post();
             $data[$i]['id']    = get_the_ID() ;
             $data[$i]['title']    = get_the_title() ;
             $data[$i]['content']  = get_the_content(); 
@@ -158,7 +160,7 @@
 
         $return = array(
             'status'    => 'success',
-            'message'   => 'Berhasil',
+            'message'   => 'Get data Successful',
             'data'      => $data
         );
 
@@ -166,23 +168,23 @@
         if ( $data ) {
             return new WP_REST_Response( $return, 200 );
         } else {
-            return new WP_Error( 'code', __( 'message', 'text-domain' ) );
+            return new WP_Error( 400, 'Something error' );
         }
     }
 
-    function api_insertdata($isi)
+    function api_insertdata($request)
     {
         $arg = array(
             'post_type'     => 'wt9-testimonial',
-            'post_title'    => $isi['title'],
-            'post_content'  => $isi['content'],
+            'post_title'    => $request['title'],
+            'post_content'  => $request['content'],
             'post_status'   => 'publish',
-            'post_author'   => $isi['author'],
+            'post_author'   => $request['author'],
             'post_category' => ''
         );
 
         $ins = wp_insert_post( $arg );
-        update_post_meta($ins, 'rate', $isi['rate']);
+        update_post_meta($ins, 'rate', $request['rate']);
 
         if($ins)
         {
@@ -191,10 +193,11 @@
                 'p'         => $ins
             );
     
-            $inis   = new WP_Query($argu);
+            $init   = new WP_Query($argu);
     
             $i = 0;
-            while($inis->have_posts()):$inis->the_post();
+            $data = array();
+            while($init->have_posts()):$init->the_post();
                 $data[$i]['id']    = get_the_ID() ;
                 $data[$i]['title']    = get_the_title() ;
                 $data[$i]['content']  = get_the_content(); 
@@ -207,7 +210,7 @@
 
         $return = array(
             'status'    => 'success',
-            'message'   => 'Berhasil',
+            'message'   => 'Create data Successful',
             'data'      => $data
         );
 
@@ -215,32 +218,32 @@
         if ( $data ) {
             return new WP_REST_Response( $return, 200 );
         } else {
-            return new WP_Error( 'code', __( 'message', 'text-domain' ) );
+            return new WP_Error( 400, 'Something error' );
         }
     }
 
-    function api_deleteone($isi)
+    function api_deleteone($request)
     {
-        $del    = wp_delete_post( $isi['id'], true );
+        $del    = wp_delete_post( $request['id'], true );
 
         $return = array(
             'status'    => 'success',
-            'message'   => 'Berhasil menghapus data',
+            'message'   => 'Delete data Successful',
         );
 
         if ( $del ) {
             return new WP_REST_Response( $return, 200 );
         } else {
-            return new WP_Error( 'code', __( 'message', 'text-domain' ) );
+            return new WP_Error( 400, 'Something Error' );
         }
     }
 
-    function api_updateone($isi)
+    function api_updateone($request)
     {
         $arg = array(
-            'ID'            => $isi['id'],
-            'post_title'    => $isi['title'],
-            'post_content'  => $isi['content'],
+            'ID'            => $request['id'],
+            'post_title'    => $request['title'],
+            'post_content'  => $request['content'],
         );
 
         $ins = wp_update_post( $arg );
@@ -252,10 +255,11 @@
                 'p'         => $ins
             );
     
-            $inis   = new WP_Query($argu);
+            $init   = new WP_Query($argu);
     
             $i = 0;
-            while($inis->have_posts()):$inis->the_post();
+            $data = array();
+            while($init->have_posts()):$init->the_post();
                 $data[$i]['id']    = get_the_ID() ;
                 $data[$i]['title']    = get_the_title() ;
                 $data[$i]['content']  = get_the_content(); 
@@ -267,7 +271,7 @@
 
         $return = array(
             'status'    => 'success',
-            'message'   => 'Berhasil',
+            'message'   => 'Update data Successful',
             'data'      => $data
         );
 
@@ -275,7 +279,7 @@
         if ( $data ) {
             return new WP_REST_Response( $return, 200 );
         } else {
-            return new WP_Error( 'code', __( 'message', 'text-domain' ) );
+            return new WP_Error( 400, 'Something Error' );
         }
     }
 
