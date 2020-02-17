@@ -216,7 +216,7 @@
 
         //return a response or error based on some conditional
         if ( $data ) {
-            return new WP_REST_Response( $return, 200 );
+            return new WP_REST_Response( $return, 201 );
         } else {
             return new WP_Error( 400, 'Something error' );
         }
@@ -232,7 +232,7 @@
         );
 
         if ( $del ) {
-            return new WP_REST_Response( $return, 200 );
+            return new WP_REST_Response( $return, 204 );
         } else {
             return new WP_Error( 400, 'Something Error' );
         }
@@ -277,7 +277,7 @@
 
         //return a response or error based on some conditional
         if ( $data ) {
-            return new WP_REST_Response( $return, 200 );
+            return new WP_REST_Response( $return, 204 );
         } else {
             return new WP_Error( 400, 'Something Error' );
         }
