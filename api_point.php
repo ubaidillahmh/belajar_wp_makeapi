@@ -36,8 +36,21 @@
                           },
                     ),
                     'date'      => array(
-                        'required'  => true
+                        'required'  => true,
+                        'validate_callback' => function($param, $request, $key) {
+                            $cekdate = checkdate(date('m', strtotime($param)), date('d', strtotime($param)), date('Y', strtotime($param)));
+                            return $cekdate;
+                        }
                     ),
+                    'rate'      => array(
+                        'required'  => true,
+                        'validate_callback' => function ($param, $request, $key){
+                            $cekdata = [1, 2, 3, 4, 5];
+                            $cekavai = in_array($param, $cekdata);
+
+                            return $cekavai;
+                        }
+                    )
                 ),
             ), 
         ));
@@ -105,6 +118,7 @@
             $data[$i]['content']  = get_the_content(); 
             $data[$i]['author']   = get_the_author();
             $data[$i]['date']     = get_the_date();
+            $data[$i]['rate']     = get_post_meta(get_the_ID(), 'rate', true);
             $i++;
         endwhile;
 
@@ -138,6 +152,7 @@
             $data[$i]['content']  = get_the_content(); 
             $data[$i]['author']   = get_the_author();
             $data[$i]['date']     = get_the_date();
+            $data[$i]['rate']     = get_post_meta(get_the_ID(), 'rate', true);
             $i++;
         endwhile;
 
@@ -162,11 +177,12 @@
             'post_title'    => $isi['title'],
             'post_content'  => $isi['content'],
             'post_status'   => 'publish',
-            'post_author'   => '1',
+            'post_author'   => $isi['author'],
             'post_category' => ''
         );
 
         $ins = wp_insert_post( $arg );
+        update_post_meta($ins, 'rate', $isi['rate']);
 
         if($ins)
         {
@@ -184,6 +200,7 @@
                 $data[$i]['content']  = get_the_content(); 
                 $data[$i]['author']   = get_the_author();
                 $data[$i]['date']     = get_the_date();
+                $data[$i]['rate']     = get_post_meta(get_the_ID(), 'rate', true);
                 $i++;
             endwhile;
         }
